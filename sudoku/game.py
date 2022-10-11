@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-from copy import deepcopy
+import copy
 from pprint import pprint
-
 from sudoku.test import *
 
 
 class Solution(object):
+    """Primary solution"""
+
     def __init__(self, sudoku: list):
         self.sudoku = sudoku
 
@@ -38,16 +39,16 @@ class Solution(object):
 
     def secondRemoveValue(self):
         """Find out the value that appears only once to fill in the box."""
-        count_row = [[0] * 10 for _ in range(9)]
-        count_col = [[0] * 10 for _ in range(9)]
-        count_grd = [[0] * 10 for _ in range(9)]
-        # The number of times statistical values appear in rows, columns, and 9×9 grids.
+        count_row = [[0] * 9 for _ in range(9)]
+        count_col = [[0] * 9 for _ in range(9)]
+        count_grd = [[0] * 9 for _ in range(9)]
+        # The valueber of times statistical values appear in rows, columns, and 9×9 grids.
         for i in range(9):
             for j in range(9):
-                for num in self.sudoku[i][j]:
-                    count_row[i][num] += 1
-                    count_col[j][num] += 1
-                    count_grd[i // 3 * 3 + j // 3][num] += 1
+                for value in self.sudoku[i][j]:
+                    count_row[i][value - 1] += 1
+                    count_col[j][value - 1] += 1
+                    count_grd[i // 3 * 3 + j // 3][value - 1] += 1
 
         for i in range(9):
             for j in range(9):
@@ -62,9 +63,9 @@ class Solution(object):
                         for n in range(i % 3 * 3, i % 3 * 3 + 3):
                             self.confirmLocation(m, n, j)
 
-    def confirmLocation(self, row, col, num):
-        if num in self.sudoku[row][col]:
-            self.sudoku[row][col][0] = num
+    def confirmLocation(self, row, col, value):
+        if value in self.sudoku[row][col]:
+            # self.sudoku[row][col][0] = value
             self.firstRemoveValue()
 
 
@@ -74,67 +75,72 @@ class DFS(Solution):
         super().__init__(sudoku)
         self.tmpSolve()
 
-    def solve(self):
+    def solve(self) -> list:
         self.getLeastGrid()
-        if len(self.node) == 0:
-            return
-        x, y = self.node[0], self.node[1]
-        for value in self.sudoku[x][y]:
-            storage = deepcopy(self.sudoku)
-            self.sudoku[x][y] = [value]
-            self.firstRemoveValue()
-            self.secondRemoveValue()
-            if self.judge():
-                self.getLeastGrid()
-                self.solve()
-                if self.sudoku is not None:
-                    return self.sudoku
-                else:
-                    self.sudoku = storage
+        if self.node is None:
+            return self.sudoku
+        r, c = self.node[0], self.node[1]
+        for value in self.sudoku[r][c]:
+            tmp = copy.deepcopy(self.sudoku)
+            tmp[r][c] = [value]
+            obj = DFS(tmp)
+            obj.firstRemoveValue()
+            obj.secondRemoveValue()
+            if obj.judge():
+                tmp = obj.solve()
+                if tmp is not None:
+                    return tmp
 
     def getLeastGrid(self):
-        minn = 100
+        minn = 10
+        self.node = None
         for i in range(9):
             for j in range(9):
                 if 1 < len(self.sudoku[i][j]) < minn:
                     minn = len(self.sudoku[i][j])
-                    self.node = [i, j]
+                    self.node = (i, j)
 
-    def judge(self):
+    def judge(self) -> bool:
         """Determine whether a certain value can be stored at a certain location."""
-        count_row = [[False] * 10 for _ in range(12)]
-        count_col = [[False] * 10 for _ in range(12)]
-        count_grd = [[False] * 10 for _ in range(12)]
+        count_row = [[False] * 10 for _ in range(10)]
+        count_col = [[False] * 10 for _ in range(10)]
+        count_grd = [[False] * 10 for _ in range(10)]
+
         for i in range(9):
             for j in range(9):
                 if len(self.sudoku[i][j]) == 1:
                     if count_row[i][self.sudoku[i][j][0]] or count_col[j][self.sudoku[i][j][0]] or \
                             count_grd[i // 3 * 3 + j // 3][self.sudoku[i][j][0]]:
                         return False
+
                     count_row[i][self.sudoku[i][j][0]] = True
                     count_col[j][self.sudoku[i][j][0]] = True
-                    count_row[i // 3 * 3 + j // 3][self.sudoku[i][j][0]] = True
-
+                    count_grd[i // 3 * 3 + j // 3][self.sudoku[i][j][0]] = True
         return True
 
 
 def main(sudoku):
     while True:
-        obj = DFS(sudoku)
-        obj.solve()
-        if obj.sudoku is not None:
-            pprint(obj.sudoku)
-            return
-        if not obj.judge():
-            print("Tmp Wrong")
+        o = DFS(sudoku)
+        result = o.solve()
+        if o.sudoku is not None:
+            return result
+        if not o.judge():
+            continue
 
 
 if __name__ == "__main__":
-    print("************************************************************")
-    main(test0)
-    print("************************************************************")
-    main(test1)
-    print("************************************************************")
-    main(test2)
-    print("************************************************************")
-    main(test3)
+    s = [
+        [[8], [], [], [], [], [], [], [], []],
+        [[], [], [3], [6], [], [], [], [], []],
+        [[], [7], [], [], [9], [], [2], [], []],
+        [[], [5], [], [], [], [7], [], [], []],
+        [[], [], [], [], [4], [5], [7], [], []],
+        [[], [], [], [1], [], [], [], [3], []],
+        [[], [], [1], [], [], [], [], [6], [8]],
+        [[], [], [8], [5], [], [], [], [1], []],
+        [[], [9], [], [], [], [], [4], [], []]
+    ]
+    test = Solution(s)
+    test.tmpSolve()
+    pprint(main(s))
