@@ -65,7 +65,6 @@ class Solution(object):
 
     def confirmLocation(self, row, col, value):
         if value in self.sudoku[row][col]:
-            # self.sudoku[row][col][0] = value
             self.firstRemoveValue()
 
 
@@ -83,6 +82,7 @@ class DFS(Solution):
         for value in self.sudoku[r][c]:
             tmp = copy.deepcopy(self.sudoku)
             tmp[r][c] = [value]
+            self.sudoku[r][c].remove(value)
             obj = DFS(tmp)
             obj.firstRemoveValue()
             obj.secondRemoveValue()
