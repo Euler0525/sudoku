@@ -59,4 +59,4 @@
 
 $9\times9$的数独矩阵$\rightarrow\rightarrow\rightarrow$破解后的数独矩阵，如下图
 
-![](F:\sudoku\img\result.png)
+![](./img/result.png)
