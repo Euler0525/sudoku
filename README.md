@@ -32,7 +32,20 @@
 
 ## 项目结构
 
-本程序采用面向过程思路编写，方法即所需参数如图
+```shell
+.
+├── README.md
+├── img
+│   ├── result.png
+│   └── structure.png
+├── main.py
+├── requirements.txt
+└── test.txt
+
+1 directories, 6 files
+```
+
+本程序(`main.py`)采用面向过程思路编写，方法即所需参数如图
 
 - `first···`：与算法3.1对应
 
