@@ -53,7 +53,7 @@
 
 - `dfsSearch`：深度优先算法 
 
-<img src="file:///F:/sudoku/img/structure.png" title="" alt="" width="392">
+<img src="./img/structure.png" title="" alt="" width="392">
 
 ## 运行结果
 
